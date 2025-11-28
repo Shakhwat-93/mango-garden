@@ -452,7 +452,18 @@
     </div>
 
     <script>
-        // --- 1. Fade In Animation on Scroll ---
+        // --- 1. Fade In Animation on Scroll & Setup ---
+        window.dataLayer = window.dataLayer || [];
+        
+        // **FIX 1: Page View Event Added Here**
+        window.dataLayer.push({
+            event: "page_view",
+            page_type: "home_landing_page",
+            page_title: document.title,
+            currency: "BDT",
+            user_login_status: "guest"
+        });
+
         function reveal() {
             var reveals = document.querySelectorAll(".reveal");
             for (var i = 0; i < reveals.length; i++) {
@@ -465,8 +476,7 @@
             }
         }
         window.addEventListener("scroll", reveal);
-        // Trigger once on load
-        reveal();
+        reveal(); // Trigger once on load
 
         // --- 2. Mobile Menu Toggle ---
         const btn = document.getElementById("mobile-menu-btn");
@@ -475,7 +485,6 @@
 
         function toggleMobileMenu() {
             menu.classList.toggle("hidden");
-            // Delay for animation
             if(!menu.classList.contains("hidden")){
                 setTimeout(() => menu.classList.add("open"), 10);
                 icon.classList.remove("fa-bars");
@@ -488,12 +497,11 @@
         }
 
         btn.addEventListener("click", () => {
-             // Logic to handle class 'hidden' specifically for animation
              if (menu.classList.contains('hidden')) {
                 menu.classList.remove('hidden');
                 setTimeout(() => {
                     menu.classList.add('open');
-                }, 20); // slight delay to allow display block to render
+                }, 20);
                 icon.classList.remove("fa-bars");
                 icon.classList.add("fa-times");
              } else {
@@ -508,7 +516,7 @@
              }
         });
 
-        // --- 3. E-Commerce Logic (Existing) ---
+        // --- 3. E-Commerce Logic ---
         let cart = [];
         let couponApplied = false;
         const COUPON_CODE = "WINTER20";
@@ -654,8 +662,7 @@
             let payAmount = parseFloat(total.replace(/[^\d.]/g, '')) || 0;
             let transactionId = "MGD" + Math.floor(Math.random() * 1000000); 
 
-            // GTM Event
-            window.dataLayer = window.dataLayer || [];
+            // **FIX 2: Purchase Event with Customer Info**
             window.dataLayer.push({
                 event: "purchase",
                 ecommerce: {
@@ -675,6 +682,13 @@
                         item_category: "Gur Combos",
                         quantity: 1
                     }))
+                },
+                // Customer Info added for Enhanced Conversions
+                customer_info: {
+                    billing_name: name,
+                    billing_phone: phone,
+                    billing_address: address,
+                    country: "BD"
                 }
             });
 
@@ -692,12 +706,16 @@
             existingOrders.push(newOrder);
             localStorage.setItem('mango_orders', JSON.stringify(existingOrders));
             
-            // Redirect
+            // Cleanup and Redirect
             cart = [];
             couponApplied = false;
             updateCartUI();
             e.target.reset();
-            window.location.href = `success.html?id=${transactionId}&name=${encodeURIComponent(name)}&total=${encodeURIComponent(total)}`;
+            
+            // **FIX 3: Redirect Delay**
+            setTimeout(() => {
+                window.location.href = `success.html?id=${transactionId}&name=${encodeURIComponent(name)}&total=${encodeURIComponent(total)}`;
+            }, 1000);
         }
     </script>
 </body>
